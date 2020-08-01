@@ -1,16 +1,22 @@
 const imageContainer = document.getElementById('image-container');
 const loader = document.getElementById('loader');
 let photosArray = [];
-let themePhotos = "travel";
+let themePhotos = "";
 
 // Unsplash API
 let count = 4;
 let ready = false;
 let imagesLoaded = 0;
 let totalImages = 0;
+const proxyUrl = 'https://obscure-harbor-43761.herokuapp.com/';
 // Normally, don't store API Keys like this, but an exception made here because it is free, and the data is publicly available!
 const apiKey = 'jFgS8tteGD425f4oZfygQVaVnD6gt6GucN2yyz3xFek';
-let apiUrl = `https://api.unsplash.com/photos/random?client_id=${apiKey}&count=${count}&query=${themePhotos}`;
+let apiUrl = "";
+
+function setApiUrl() {
+  apiUrl = `${proxyUrl}https://api.unsplash.com/photos/random?client_id=${apiKey}&count=${count}&query=${themePhotos}`; 
+  console.log("utilisation fonction setApiUrl avec l'adresse : " + apiUrl) ;
+}
 
 // on vérifie si toutes les images sont bien chargées
 function imageLoaded() {
@@ -20,8 +26,10 @@ function imageLoaded() {
     console.log("ready = true");
     ready = true;
     loader.hidden = true;
+    imageContainer.hidden = false;
     count = 20;
-    apiUrl = `https://api.unsplash.com/photos/random?client_id=${apiKey}&count=${count}&query=${themePhotos}`;
+    // apiUrl = `${proxyUrl}https://api.unsplash.com/photos/random?client_id=${apiKey}&count=${count}&query=${themePhotos}`;
+    setApiUrl();
   }
 }
 
@@ -39,37 +47,51 @@ function displayPhotos() {
     photosArray.forEach( (photo) => {
 
     // Création du lien vers le site unsplash
-    const item = document.createElement('a');
-    // item.setAttribute('href', photo.links.html);
-    // item.setAttribute('target', '_blank');
-    setAttributes(item, {
+    const itemImage = document.createElement('div');
+    itemImage.classList.add('item-image');
+
+    const linkedImage = document.createElement('a');
+
+    setAttributes(linkedImage, {
         href: photo.links.html,
         target: '_blank',
       });
+    linkedImage.classList.add('linked-image');
 
     // création de l'image
     const img = document.createElement('img');
-    // img.setAttribute('src', photo.urls.regular);
-    // img.setAttribute('alt', photo.alt_description);
-    // img.setAttribute('title', photo.alt_description);
+
     setAttributes(img, {
         src: photo.urls.regular,
         alt: photo.alt_description,
         title: photo.alt_description,
       });
-
     // ajout de l'event listener pour s'assurer que l'image est chargée
     img.addEventListener('load', imageLoaded);
+
+    // creation d'un descriptif
+    const descriptionImage = document.createElement('div');
+    descriptionImage.classList.add('description-image');
+    let titrePhoto = "";
+    if (!photo.location.name) {
+      titrePhoto = document.createTextNode("Unknown location");
+    } else {
+      titrePhoto = document.createTextNode(photo.location.name);  
+    }
+   
     // on ajoute ces éléments au container
-    item.appendChild(img);
-    imageContainer.appendChild(item);
+    descriptionImage.appendChild(titrePhoto);
+    linkedImage.appendChild(img);
+    itemImage.appendChild(linkedImage);
+    itemImage.appendChild(descriptionImage);
+    imageContainer.appendChild(itemImage);
     });
 }
 
 
 // Get photos from Unsplash API
 async function getPhotos() {
-    // loader.hidden = false;
+    
     try {
       const response = await fetch(apiUrl);
       photosArray = await response.json();
@@ -96,12 +118,14 @@ function selectionTheme() {
   //changedText.textContent = this.value;
   console.log("Sélection du thème : " + this.value);
   loader.hidden = false;
+  imageContainer.hidden = true;
   while (imageContainer.firstChild) {
     imageContainer.removeChild(imageContainer.firstChild);
   }
   themePhotos = this.value;
   count = 4;
-  apiUrl = `https://api.unsplash.com/photos/random?client_id=${apiKey}&count=${count}&query=${themePhotos}`;
+  // apiUrl = `${proxyUrl}https://api.unsplash.com/photos/random?client_id=${apiKey}&count=${count}&query=${themePhotos}`;
+  setApiUrl();
   getPhotos();
 
 }
@@ -110,5 +134,6 @@ document.getElementById("slct").onchange = selectionTheme;
 
 
   // On Load
-
+  imageContainer.hidden = true;
+  setApiUrl();
   getPhotos();
