@@ -48,7 +48,8 @@ function displayPhotos() {
 
     // Création du lien vers le site unsplash
     const itemImage = document.createElement('div');
-    itemImage.classList.add('item-image');
+    itemImage.classList.add('item-image'); 
+    itemImage.classList.add('hvr-grow');
 
     const linkedImage = document.createElement('a');
 
@@ -74,9 +75,9 @@ function displayPhotos() {
     descriptionImage.classList.add('description-image');
     let titrePhoto = "";
     if (!photo.location.name) {
-      titrePhoto = document.createTextNode("Unknown location");
+      titrePhoto = document.createTextNode("@" + photo.user.username + " - Unknown location");
     } else {
-      titrePhoto = document.createTextNode(photo.location.name);  
+      titrePhoto = document.createTextNode("@" + photo.user.username + " - " + photo.location.name);  
     }
    
     // on ajoute ces éléments au container
