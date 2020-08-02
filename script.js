@@ -1,5 +1,7 @@
 const imageContainer = document.getElementById('image-container');
 const loader = document.getElementById('loader');
+const scrollToTopButton = document.getElementById('scrollToTop');
+const oupsError = document.getElementById('oups-error');
 let photosArray = [];
 let themePhotos = "";
 
@@ -9,7 +11,7 @@ let ready = false;
 let imagesLoaded = 0;
 let totalImages = 0;
 const proxyUrl = 'https://obscure-harbor-43761.herokuapp.com/';
-// Normally, don't store API Keys like this, but an exception made here because it is free, and the data is publicly available!
+// Exception -- avoid storing API Key here
 const apiKey = 'jFgS8tteGD425f4oZfygQVaVnD6gt6GucN2yyz3xFek';
 let apiUrl = "";
 
@@ -28,7 +30,6 @@ function imageLoaded() {
     loader.hidden = true;
     imageContainer.hidden = false;
     count = 20;
-    // apiUrl = `${proxyUrl}https://api.unsplash.com/photos/random?client_id=${apiKey}&count=${count}&query=${themePhotos}`;
     setApiUrl();
   }
 }
@@ -44,6 +45,7 @@ function setAttributes(element, attributes) {
 function displayPhotos() {
     imagesLoaded = 0;
     totalImages = photosArray.length;
+
     photosArray.forEach( (photo) => {
 
     // Création du lien vers le site unsplash
@@ -63,7 +65,7 @@ function displayPhotos() {
     const img = document.createElement('img');
 
     setAttributes(img, {
-        src: photo.urls.small,
+        src: photo.urls.regular,
         alt: photo.alt_description,
         title: photo.alt_description,
       });
@@ -93,6 +95,9 @@ function displayPhotos() {
 // Get photos from Unsplash API
 async function getPhotos() {
     
+    // on enlève l'eventuelle erreur de chargement qui aurait pu être là précédemment
+    oupsError.hidden = true;
+
     try {
       const response = await fetch(apiUrl);
       photosArray = await response.json();
@@ -101,6 +106,20 @@ async function getPhotos() {
     } catch (error) {
       // Catch Error Here
       console.log(error);
+      // on commence par retirer tous les éléments du container, en cas de nouvelle erreur
+      while (oupsError.firstChild) {
+        oupsError.removeChild(oupsError.firstChild);
+      }
+      // on créé les éléments à ajouter au container
+      const iconError = document.createElement('i');
+      iconError.classList.add('fas' , 'fa-exclamation-circle' , 'fa-5x');
+      const h2Error = document.createElement('h2');
+      const textError = document.createTextNode("Oups... Something went wrong... we've probably asked too much to the API, please try again later ;-)");
+      h2Error.appendChild(textError);
+      oupsError.appendChild(iconError);
+      oupsError.appendChild(h2Error);
+      loader.hidden = true;
+      oupsError.hidden = false;
     }
   }
 
@@ -111,12 +130,22 @@ window.addEventListener('scroll', () => {
     ready = false;
     getPhotos();
   }
+
+  // check if we have move to the bottom, and show to 'scrool to the top' button
+
+  if (window.scrollY >= 500) {
+    scrollToTopButton.hidden = false;
+  } else {
+    scrollToTopButton.hidden = true;
+  }
+
+
 });
+
 
 // si sélection d'un thème
 
 function selectionTheme() {
-  //changedText.textContent = this.value;
   console.log("Sélection du thème : " + this.value);
   loader.hidden = false;
   imageContainer.hidden = true;
@@ -125,7 +154,6 @@ function selectionTheme() {
   }
   themePhotos = this.value;
   count = 4;
-  // apiUrl = `${proxyUrl}https://api.unsplash.com/photos/random?client_id=${apiKey}&count=${count}&query=${themePhotos}`;
   setApiUrl();
   getPhotos();
 

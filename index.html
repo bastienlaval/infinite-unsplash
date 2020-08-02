@@ -7,7 +7,7 @@
     <link rel="icon" type="image/png" href="favicon.png">
     <!-- <link rel="icon" type="image/png" href="https://s2.googleusercontent.com/s2/favicons?domain=jacinto.design"> -->
     
-    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.2/css/all.min.css"/> -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.2/css/all.min.css"/>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -23,12 +23,29 @@
           <option value="aerial">Drone View</option>
           <option value="music">Music</option>
           <option value="nature">Nature</option>
+          <option value="people">People</option>
+          <option value="animal">Animals</option>
+          <option value="food">Food</option>
         </select>
       </div>
 
     <!-- Image Container -->
     <div class="image-container" id="image-container"></div>
+
+    <!-- Error message if pb with the API -->
+    <div class="oups-error" id="oups-error" hidden><i class="fas fa-exclamation-circle fa-5x"></i></div>
+
+    <!-- Scroll to the top button -->
+    <div hidden id="scrollToTop" onclick="scrollToTheTop()"><i class="fa fa-angle-up"></i></div>
+
     <!-- Script -->
     <script src="script.js"></script>
+
+    <script>
+      function scrollToTheTop() {
+        window.scrollTo(0, 0);
+      }
+    </script>
+
 </body>
 </html>
